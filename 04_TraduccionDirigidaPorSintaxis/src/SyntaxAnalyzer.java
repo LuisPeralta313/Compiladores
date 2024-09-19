@@ -24,7 +24,21 @@ public class SyntaxAnalyzer {
         productions.put(1, new Production("<E>", "<E>","+","<T>"));
         productions.get(1).getActions().add("sum_e_and_t_save_value");
         
-        //Continuar con las producciones
+        productions.put(2, new Production("<E>", "<T>"));
+        productions.get(2).getActions().add("save_value_t_on_e");
+
+        productions.put(3, new Production("<T>", "<T>", "*", "<F>"));
+        productions.get(3).getActions().add("mult_f_and_t_save_value");
+
+        productions.put(4, new Production("<T>", "<F>"));
+        productions.get(4).getActions().add("save_value_f_on_t");
+        
+        productions.put(5, new Production("<F>", "(", "<E>", ")"));
+        productions.get(5).getActions().add("save_value_e_on_f");
+        
+        productions.put(6, new Production("<F>", "num"));
+        productions.get(6).getActions().add("save_value_num_on_f");
+
     }
 
     private void createParsingTable(){
@@ -42,7 +56,69 @@ public class SyntaxAnalyzer {
         parsingTable.get(0).put("<T>", new Operation(Operation.GOTO, 2));
         parsingTable.get(0).put("<F>", new Operation(Operation.GOTO, 3));
 
-        //Agregar lo demás estados acá..
+                // Estado 1
+        parsingTable.get(1).put("+", new Operation(Operation.SHIFT, 6));
+        parsingTable.get(1).put("$", new Operation(Operation.ACCEPT, 0));
+        
+        // Estado 2
+        parsingTable.get(2).put("+", new Operation(Operation.REDUCE, 2)); // R2
+        parsingTable.get(2).put(")", new Operation(Operation.REDUCE, 2)); // R2
+        parsingTable.get(2).put("*", new Operation(Operation.SHIFT, 7));
+        parsingTable.get(2).put("$", new Operation(Operation.REDUCE, 2)); // R2
+        
+        // Estado 3
+        parsingTable.get(3).put("+", new Operation(Operation.REDUCE, 4)); // R4
+        parsingTable.get(3).put(")", new Operation(Operation.REDUCE, 4)); // R4
+        parsingTable.get(3).put("*", new Operation(Operation.REDUCE, 4)); // R4
+        parsingTable.get(3).put("$", new Operation(Operation.REDUCE, 4)); // R4
+        
+        // Estado 4
+        parsingTable.get(4).put("num", new Operation(Operation.SHIFT, 5));
+        parsingTable.get(4).put("(", new Operation(Operation.SHIFT, 4));
+        parsingTable.get(4).put("<E>", new Operation(Operation.GOTO, 8));
+        parsingTable.get(4).put("<T>", new Operation(Operation.GOTO, 2));
+        parsingTable.get(4).put("<F>", new Operation(Operation.GOTO, 3));
+
+                // Estado 5
+        parsingTable.get(5).put("+", new Operation(Operation.REDUCE, 6)); // R6
+        parsingTable.get(5).put(")", new Operation(Operation.REDUCE, 6)); // R6
+        parsingTable.get(5).put("*", new Operation(Operation.REDUCE, 6)); // R6
+        parsingTable.get(5).put("$", new Operation(Operation.REDUCE, 6)); // R6
+        
+        // Estado 6
+        parsingTable.get(6).put("num", new Operation(Operation.SHIFT, 5));
+        parsingTable.get(6).put("(", new Operation(Operation.SHIFT, 4));
+        parsingTable.get(6).put("<T>", new Operation(Operation.GOTO, 9));
+        parsingTable.get(6).put("<F>", new Operation(Operation.GOTO, 3));
+        
+        // Estado 7
+        parsingTable.get(7).put("num", new Operation(Operation.SHIFT, 5));
+        parsingTable.get(7).put("(", new Operation(Operation.SHIFT, 4));
+        parsingTable.get(7).put("<F>", new Operation(Operation.GOTO, 10));
+        
+        // Estado 8
+        parsingTable.get(8).put("+", new Operation(Operation.SHIFT, 6));
+        parsingTable.get(8).put(")", new Operation(Operation.SHIFT, 11));
+        
+        // Estado 9
+        parsingTable.get(9).put("+", new Operation(Operation.REDUCE, 1)); // R1
+        parsingTable.get(9).put(")", new Operation(Operation.REDUCE, 1)); // R1
+        parsingTable.get(9).put("*", new Operation(Operation.SHIFT, 7));
+        parsingTable.get(9).put("$", new Operation(Operation.REDUCE, 1)); // R1
+        
+        // Estado 10
+        parsingTable.get(10).put("+", new Operation(Operation.REDUCE, 3)); // R3
+        parsingTable.get(10).put(")", new Operation(Operation.REDUCE, 3)); // R3
+        parsingTable.get(10).put("*", new Operation(Operation.REDUCE, 3)); // R3
+        parsingTable.get(10).put("$", new Operation(Operation.REDUCE, 3)); // R3
+        
+        // Estado 11
+        parsingTable.get(11).put("+", new Operation(Operation.REDUCE, 5)); // R5
+        parsingTable.get(11).put(")", new Operation(Operation.REDUCE, 5)); // R5
+        parsingTable.get(11).put("*", new Operation(Operation.REDUCE, 5)); // R5
+        parsingTable.get(11).put("$", new Operation(Operation.REDUCE, 5)); // R5
+
+
     }
     
     public int parse(ArrayList<Lexema> tokens){
