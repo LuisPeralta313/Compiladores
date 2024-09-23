@@ -19,7 +19,10 @@ public class SemanticAnalyzer {
             case "mult_f_and_t_save_value":
                 executeMult(operation, lexemas, ((Lexema)lexemas.get(4)).getSymbol());
             break;
-        
+            case "show_value":
+                showOperationValue(symbol);
+            break;
+
             default:
                 throw new Exception("Operación no reconocida: " + operation);
         }
@@ -63,5 +66,13 @@ public class SemanticAnalyzer {
         symbolsTable.put(variableType, new SymbolItem(variableType, function, type, scope, memoryAddress, result));
         System.out.println("Multiplicación realizada: " + operand1 + " * " + operand2 + " = " + result);
     }
-    
+    // Método para mostrar el valor de la operación
+    private void showOperationValue(GrammarSymbol symbol)  {
+    SymbolItem item = symbolsTable.get(symbol.getSymbol());
+    if (item != null) {
+        System.out.println("El resultado de la operación es: " + item.getValue());
+    } else {
+        System.out.println("No se encontró un valor para el símbolo: " + symbol.getSymbol());
+    }
+}
 }
